@@ -1,0 +1,435 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f5f7fa;
+  color: #111827;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 42px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.eyebrow,
+.label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #6b7280;
+}
+
+.eyebrow {
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.header p {
+  margin: 10px 0 0;
+  color: #9ca3af;
+}
+
+.live {
+  border: 1px solid #374151;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+main {
+  width: min(1050px, 90%);
+  margin: 35px auto 80px;
+}
+
+.processor {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 28px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.processor h2 {
+  margin: 8px 0;
+  font-size: 24px;
+}
+
+.processor p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.processor-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.processor-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  outline: none;
+  font-family: monospace;
+}
+
+.processor-form input:focus {
+  border-color: #111827;
+}
+
+.processor-form button {
+  border: 0;
+  border-radius: 10px;
+  padding: 14px 22px;
+  background: #111827;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.processor-form button:hover {
+  background: #1f2937;
+}
+
+.processor-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.error-inline {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.empty {
+  background: white;
+  border: 1px dashed #d1d5db;
+  border-radius: 18px;
+  padding: 60px 30px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 40px;
+  color: #9ca3af;
+}
+
+.empty h2 {
+  margin: 12px 0 8px;
+}
+
+.empty p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 18px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #111827;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.payment-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.payment-card h2 {
+  font-size: 42px;
+  margin: 8px 0;
+}
+
+.payment-id {
+  margin: 0;
+  color: #6b7280;
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.status-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.status {
+  padding: 8px 13px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.method {
+  color: #6b7280;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pipeline {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 55px 1fr;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.step-number {
+  font-family: monospace;
+  font-weight: 800;
+  color: #9ca3af;
+}
+
+.step-content {
+  min-width: 0;
+}
+
+.step-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.step-heading h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.step-heading p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.step-status {
+  flex-shrink: 0;
+  height: fit-content;
+  padding: 7px 11px;
+  border-radius: 7px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.step-status.positive {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.details,
+.verification,
+.decision-box,
+.policy-row {
+  margin-top: 18px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.details {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 9px 20px;
+  font-size: 13px;
+}
+
+.details span,
+.verification span,
+.decision-box span {
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.details strong {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+}
+
+.decision-box {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px 20px;
+}
+
+.policy-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.verification {
+  display: flex;
+  gap: 40px;
+}
+
+.verification div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit {
+  margin-top: 25px;
+  background: #111827;
+  color: white;
+  border-radius: 16px;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.audit h2 {
+  margin: 7px 0 0;
+}
+
+.audit .label {
+  color: #9ca3af;
+}
+
+.audit-id {
+  color: #9ca3af;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: right;
+}
+
+.audit-id strong {
+  display: block;
+  margin-top: 7px;
+  color: white;
+  font-family: monospace;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+.demo-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.demo-button {
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 11px 16px;
+  background: white;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.demo-button:hover {
+  background: #f3f4f6;
+}
+
+.demo-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.demo-row span {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .header,
+  .payment-card,
+  .audit {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .status-block {
+    align-items: flex-start;
+  }
+
+  .processor-form {
+    flex-direction: column;
+  }
+
+  .step-heading {
+    flex-direction: column;
+  }
+
+  .verification {
+    flex-direction: column;
+    gap: 15px;
+  }
+}

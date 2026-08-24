@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Razorpay Test Payment</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background: #f5f7fa;
+        }
+
+        .card {
+            max-width: 500px;
+            margin: 60px auto;
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .amount {
+            font-size: 38px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #3399cc;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 18px;
+            background: #ecfdf5;
+            border-radius: 10px;
+            word-break: break-word;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fef2f2;
+            color: #991b1b;
+            border-radius: 10px;
+        }
+
+        .test-mode {
+            margin-bottom: 20px;
+            color: #b45309;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <div class="test-mode">
+        RAZORPAY TEST MODE
+    </div>
+
+    <h1>Razorpay Test Payment</h1>
+
+    <p>AI Financial Decision Layer</p>
+
+    <div class="amount">
+        ₹5,000
+    </div>
+
+    <button id="pay-button">
+        Pay ₹5,000
+    </button>
+
+    <div id="message"></div>
+
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+const BACKEND = "http://127.0.0.1:8000";
+
+const RAZORPAY_KEY = "rzp_test_TSrOOcyaLh9WVg";
+
+const button = document.getElementById("pay-button");
+const message = document.getElementById("message");
+
+
+button.onclick = async function () {
+
+    button.disabled = true;
+    button.innerText = "Creating secure order...";
+
+    message.innerHTML = "";
+
+    try {
+
+        /*
+         * IMPORTANT:
+         * Create a NEW Razorpay order every time.
+         */
+        const orderResponse = await fetch(
+            `${BACKEND}/razorpay/orders`,
+            {
+                method: "POST"
+            }
+        );
+
+        const orderData = await orderResponse.json();
+
+        if (!orderResponse.ok) {
+            throw new Error(
+                orderData.error || "Could not create Razorpay order."
+            );
+        }
+
+        if (!orderData.order || !orderData.order.id) {
+            throw new Error("Backend did not return an order ID.");
+        }
+
+        const orderId = orderData.order.id;
+
+        console.log("NEW RAZORPAY ORDER:", orderId);
+
+
+        const options = {
+
+            key: RAZORPAY_KEY,
+
+            amount: orderData.order.amount,
+
+            currency: orderData.order.currency || "INR",
+
+            name: "AI Financial Decision Layer",
+
+            description: "Buildathon Test Payment",
+
+            order_id: orderId,
+
+            handler: function (response) {
+
+                console.log("PAYMENT SUCCESS");
+
+                console.log(
+                    "Payment ID:",
+                    response.razorpay_payment_id
+                );
+
+                console.log(
+                    "Order ID:",
+                    response.razorpay_order_id
+                );
+
+                console.log(
+                    "Signature:",
+                    response.razorpay_signature
+                );
+
+
+                message.innerHTML = `
+                    <div class="result">
+
+                        <h3>Test Payment Created</h3>
+
+                        <p>
+                            <strong>Payment ID:</strong><br>
+                            ${response.razorpay_payment_id}
+                        </p>
+
+                        <p>
+                            <strong>Order ID:</strong><br>
+                            ${response.razorpay_order_id}
+                        </p>
+
+                        <p>
+                            Payment completed in Razorpay Test Mode.
+                        </p>
+
+                    </div>
+                `;
+
+                button.disabled = false;
+                button.innerText = "Pay ₹5,000 Again";
+            },
+
+            modal: {
+
+                ondismiss: function () {
+
+                    button.disabled = false;
+                    button.innerText = "Pay ₹5,000";
+
+                }
+
+            },
+
+            theme: {
+                color: "#3399cc"
+            }
+        };
+
+
+        const razorpay = new Razorpay(options);
+
+        razorpay.on(
+            "payment.failed",
+            function (response) {
+
+                console.log(
+                    "PAYMENT FAILED:",
+                    response.error
+                );
+
+                message.innerHTML = `
+                    <div class="error">
+
+                        <strong>Payment failed</strong>
+
+                        <p>
+                            ${response.error.description || ""}
+                        </p>
+
+                    </div>
+                `;
+
+                button.disabled = false;
+                button.innerText = "Pay ₹5,000";
+            }
+        );
+
+
+        razorpay.open();
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.innerHTML = `
+            <div class="error">
+                <strong>Could not start payment</strong>
+                <p>${error.message}</p>
+            </div>
+        `;
+
+        button.disabled = false;
+        button.innerText = "Pay ₹5,000";
+    }
+
+};
+
+</script>
+
+</body>
+</html>
