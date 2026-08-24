@@ -8,10 +8,6 @@ import uuid
 import razorpay
 
 
-# =========================================================
-# CONFIGURATION
-# =========================================================
-
 load_dotenv("backend/.env")
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
@@ -22,19 +18,11 @@ razorpay_client = razorpay.Client(
 )
 
 
-# =========================================================
-# APPLICATION
-# =========================================================
-
 app = FastAPI(
     title="AI Financial Decision & Verification Layer",
     version="0.1.0",
 )
 
-
-# =========================================================
-# CORS
-# =========================================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,10 +39,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# =========================================================
-# IN-MEMORY AUDIT RECORDS
-# =========================================================
 
 decision_records = {}
 
@@ -75,10 +59,6 @@ def get_or_create_record(event_id: str):
     return decision_records[event_id]
 
 
-# =========================================================
-# DATA MODEL
-# =========================================================
-
 class FinancialEvent(BaseModel):
     payment_id: str
     amount: float = Field(gt=0)
@@ -86,10 +66,6 @@ class FinancialEvent(BaseModel):
     failure_reason: str | None = None
     previous_attempts: int = Field(default=0, ge=0)
 
-
-# =========================================================
-# HEALTH
-# =========================================================
 
 @app.get("/health")
 def health():
@@ -100,10 +76,6 @@ def health():
         ),
     }
 
-
-# =========================================================
-# 1. FINANCIAL EVENT
-# =========================================================
 
 @app.post("/financial-events")
 def create_financial_event(event: FinancialEvent):
@@ -121,10 +93,6 @@ def create_financial_event(event: FinancialEvent):
         "event": event.model_dump(),
     }
 
-
-# =========================================================
-# 2. EVIDENCE COLLECTION
-# =========================================================
 
 @app.post("/financial-events/{event_id}/evidence")
 def collect_evidence(
@@ -163,16 +131,6 @@ def collect_evidence(
         "evidence": evidence,
     }
 
-
-# =========================================================
-# 3. AI DECISION
-# =========================================================
-#
-# DEVELOPMENT STUB
-#
-# This is deliberately deterministic for the prototype.
-# Later this can be replaced with a real LLM.
-# =========================================================
 
 @app.post("/financial-events/{event_id}/decision")
 def make_decision(
@@ -227,10 +185,6 @@ def make_decision(
     }
 
 
-# =========================================================
-# 4. DETERMINISTIC POLICY ENGINE
-# =========================================================
-
 @app.post("/financial-events/{event_id}/policy-check")
 def check_policy(
     event_id: str,
@@ -242,10 +196,6 @@ def check_policy(
 
     reasons = []
     allowed = True
-
-    # -----------------------------------------------------
-    # Already captured
-    # -----------------------------------------------------
 
     if event.status == "captured":
 
@@ -273,10 +223,6 @@ def check_policy(
             "event_id": event_id,
             **policy_result,
         }
-
-    # -----------------------------------------------------
-    # Failed payment rules
-    # -----------------------------------------------------
 
     if event.previous_attempts >= max_retries:
 
@@ -330,10 +276,6 @@ def check_policy(
     }
 
 
-# =========================================================
-# 5. CONTROLLED EXECUTION
-# =========================================================
-
 @app.post("/financial-events/{event_id}/execute")
 def execute_action(
     event_id: str,
@@ -342,10 +284,6 @@ def execute_action(
 
     max_retries = 2
     amount_limit = 10000
-
-    # -----------------------------------------------------
-    # Already captured
-    # -----------------------------------------------------
 
     if event.status == "captured":
 
@@ -364,10 +302,6 @@ def execute_action(
             **execution_result,
         }
 
-    # -----------------------------------------------------
-    # Retry safety
-    # -----------------------------------------------------
-
     if event.previous_attempts >= max_retries:
 
         execution_result = {
@@ -384,10 +318,6 @@ def execute_action(
             "event_id": event_id,
             **execution_result,
         }
-
-    # -----------------------------------------------------
-    # Amount safety
-    # -----------------------------------------------------
 
     if event.amount > amount_limit:
 
@@ -409,10 +339,6 @@ def execute_action(
             **execution_result,
         }
 
-    # -----------------------------------------------------
-    # Payment state safety
-    # -----------------------------------------------------
-
     if event.status != "failed":
 
         execution_result = {
@@ -429,10 +355,6 @@ def execute_action(
             "event_id": event_id,
             **execution_result,
         }
-
-    # -----------------------------------------------------
-    # Controlled development action
-    # -----------------------------------------------------
 
     action_id = f"act_{uuid.uuid4().hex[:8]}"
 
@@ -453,10 +375,6 @@ def execute_action(
         **execution_result,
     }
 
-
-# =========================================================
-# 6. DEVELOPMENT VERIFICATION
-# =========================================================
 
 @app.post("/financial-events/{event_id}/verify")
 def verify_outcome(
@@ -491,10 +409,6 @@ def verify_outcome(
     }
 
 
-# =========================================================
-# 7. RAZORPAY PAYMENT LOOKUP
-# =========================================================
-
 @app.get("/razorpay/payments/{payment_id}")
 def get_razorpay_payment(payment_id: str):
 
@@ -518,10 +432,6 @@ def get_razorpay_payment(payment_id: str):
             "error": str(exc),
         }
 
-
-# =========================================================
-# 8. RAZORPAY TEST ORDER
-# =========================================================
 
 @app.post("/razorpay/orders")
 def create_razorpay_order(
@@ -550,10 +460,6 @@ def create_razorpay_order(
             "error": str(exc),
         }
 
-
-# =========================================================
-# 9. REAL RAZORPAY VERIFICATION
-# =========================================================
 
 @app.post(
     "/financial-events/{event_id}/verify-razorpay/{payment_id}"
@@ -608,10 +514,6 @@ def verify_razorpay_outcome(
         }
 
 
-# =========================================================
-# 10. CREATE EVENT FROM REAL RAZORPAY PAYMENT
-# =========================================================
-
 @app.post(
     "/financial-events/from-razorpay/{payment_id}"
 )
@@ -658,10 +560,6 @@ def create_event_from_razorpay(
         }
 
 
-# =========================================================
-# 11. COMPLETE REAL RAZORPAY PIPELINE
-# =========================================================
-
 @app.post(
     "/financial-events/from-razorpay/{payment_id}/process"
 )
@@ -670,10 +568,6 @@ def process_razorpay_payment(
 ):
 
     try:
-
-        # -------------------------------------------------
-        # 1. Fetch REAL Razorpay payment
-        # -------------------------------------------------
 
         payment = razorpay_client.payment.fetch(
             payment_id
@@ -699,10 +593,6 @@ def process_razorpay_payment(
         record = get_or_create_record(event_id)
 
         record["event"] = event
-
-        # -------------------------------------------------
-        # 2. Evidence
-        # -------------------------------------------------
 
         evidence = {
             "event_id": event_id,
@@ -733,10 +623,6 @@ def process_razorpay_payment(
         }
 
         record["evidence"] = evidence
-
-        # -------------------------------------------------
-        # 3. Decision
-        # -------------------------------------------------
 
         if payment.get("status") == "captured":
 
@@ -777,10 +663,6 @@ def process_razorpay_payment(
             }
 
         record["decision"] = decision
-
-        # -------------------------------------------------
-        # 4. Policy
-        # -------------------------------------------------
 
         if payment.get("status") == "captured":
 
@@ -850,15 +732,7 @@ def process_razorpay_payment(
 
         record["policy"] = policy
 
-        # -------------------------------------------------
-        # 5. Execution
-        # -------------------------------------------------
-
         record["execution"] = execution
-
-        # -------------------------------------------------
-        # 6. REAL Razorpay Verification
-        # -------------------------------------------------
 
         verified_payment = razorpay_client.payment.fetch(
             payment_id
@@ -887,10 +761,6 @@ def process_razorpay_payment(
         }
 
         record["verification"] = verification
-
-        # -------------------------------------------------
-        # 7. COMPLETE RESULT
-        # -------------------------------------------------
 
         return {
             "status": "processed",
@@ -926,7 +796,6 @@ def process_demo_failure():
 
     record = get_or_create_record(event_id)
 
-    # Evidence
     record["event"] = event
 
     record["evidence"] = {
@@ -941,7 +810,6 @@ def process_demo_failure():
         },
     }
 
-    # Decision
     record["decision"] = {
         "root_cause": "authentication_required",
         "recommended_action": "request_authentication",
@@ -952,7 +820,6 @@ def process_demo_failure():
         "source": "development_ai_stub",
     }
 
-    # Policy
     record["policy"] = {
         "decision": "ALLOWED",
         "allowed": True,
@@ -962,7 +829,6 @@ def process_demo_failure():
         "execution_permitted": True,
     }
 
-    # Controlled execution
     action_id = f"act_{uuid.uuid4().hex[:8]}"
 
     record["execution"] = {
@@ -973,11 +839,6 @@ def process_demo_failure():
         "environment": "development",
     }
 
-    # Verification
-    #
-    # The demo payment remains failed, so we honestly
-    # report that the desired successful outcome has
-    # not yet been verified.
     record["verification"] = {
         "status": "not_verified",
         "source": "development_demo",
@@ -992,10 +853,6 @@ def process_demo_failure():
         "event_id": event_id,
         "record": record,
     }
-# =========================================================
-# 12. COMPLETE AUDIT
-# =========================================================
-
 @app.get("/audit/{event_id}")
 def get_audit(event_id: str):
 
